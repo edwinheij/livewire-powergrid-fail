@@ -28,16 +28,41 @@ final class User2Table extends PowerGridComponent
             Exportable::make('export')
                 ->striped()
                 ->type(Exportable::TYPE_XLS, Exportable::TYPE_CSV),
-            Header::make()->showSearchInput(),
+            Header::make()->showSearchInput()->showToggleColumns(),
             Footer::make()
                 ->showPerPage()
                 ->showRecordCount(),
         ];
     }
 
+    protected function getListeners()
+    {
+        return array_merge(
+            parent::getListeners(),
+            [
+                'asdf',
+            ]
+        );
+    }
+
+    public $letter = 'art';
+
+    public function asdf()
+    {
+        $letters = ['art', 'ba', 'c', 'd', 'e', 'f', 'g', 'Ferne', 'Ebba', 'Alden', 'Floyd', 'Cecile'];
+
+        $range = array_rand(range(0, count($letters) - 1));
+        $this->letter = $letters[$range];
+
+        data_set($this->filters, 'input_text.name', $this->letter);
+    }
+
     public function datasource(): Builder
     {
-        return User::query();
+        $letter = $this->letter ?? 'art';
+
+        return User::query()
+            ->where('name', 'like', '%' . $letter . '%');
     }
 
     public function relationSearch(): array

@@ -18,11 +18,11 @@ final class UserTable extends PowerGridComponent
     public function datasource(): ?Collection
     {
         return collect([
-            ['id' => 1, 'name' => 'Name 1', 'price' => 1.58, 'created_at' => now(),],
-            ['id' => 2, 'name' => 'Name 2', 'price' => 1.68, 'created_at' => now(),],
-            ['id' => 3, 'name' => 'Name 3', 'price' => 1.78, 'created_at' => now(),],
-            ['id' => 4, 'name' => 'Name 4', 'price' => 1.88, 'created_at' => now(),],
-            ['id' => 5, 'name' => 'Name 5', 'price' => 1.98, 'created_at' => now(),],
+            ['id' => 1, 'name' => 'Name 1', 'price' => 1.58, 'created_at' => now(), 'actual' => 1],
+            ['id' => 2, 'name' => 'Name 2', 'price' => 1.68, 'created_at' => now(), 'actual' => 1],
+            ['id' => 3, 'name' => 'Name 3', 'price' => 1.78, 'created_at' => now(), 'actual' => 1],
+            ['id' => 4, 'name' => 'Name 4', 'price' => 1.88, 'created_at' => now(), 'actual' => 0],
+            ['id' => 5, 'name' => 'Name 5', 'price' => 1.98, 'created_at' => now(), 'actual' => 0],
         ]);
     }
 
@@ -47,6 +47,7 @@ final class UserTable extends PowerGridComponent
             ->addColumn('id')
             ->addColumn('name')
             ->addColumn('price')
+            ->addColumn('actual')
             ->addColumn('created_at_formatted', function ($entry) {
                 return Carbon::parse($entry->created_at)->format('d/m/Y');
             });
@@ -67,6 +68,8 @@ final class UserTable extends PowerGridComponent
                 ->searchable()
                 ->sortable(),
 
+            Column::make('Actual', 'actual'),
+
             Column::make('Created', 'created_at_formatted'),
 
             Column::action('Action')
@@ -78,6 +81,9 @@ final class UserTable extends PowerGridComponent
         return [
             Filter::inputText('name'),
             Filter::inputText('price'),
+            Filter::enumSelect('actual', 'actual')
+                ->dataSource(\App\Support\Enums\YesNo::cases())
+                ->optionLabel('actual'),
         ];
     }
 }

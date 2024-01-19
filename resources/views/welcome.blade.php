@@ -16,6 +16,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="antialiased">
+        <button onClick="Livewire.dispatch('asdf')" type="button">asdf</button>
         <livewire:user2-table/>
         <livewire:user-table/>
     </body>
