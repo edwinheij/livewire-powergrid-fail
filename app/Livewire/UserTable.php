@@ -18,11 +18,11 @@ final class UserTable extends PowerGridComponent
     public function datasource(): ?Collection
     {
         return collect([
-            ['id' => 1, 'name' => 'Name 1', 'price' => 1.58, 'created_at' => now(), 'actual' => 1],
-            ['id' => 2, 'name' => 'Name 2', 'price' => 1.68, 'created_at' => now(), 'actual' => 1],
-            ['id' => 3, 'name' => 'Name 3', 'price' => 1.78, 'created_at' => now(), 'actual' => 1],
-            ['id' => 4, 'name' => 'Name 4', 'price' => 1.88, 'created_at' => now(), 'actual' => 0],
-            ['id' => 5, 'name' => 'Name 5', 'price' => 1.98, 'created_at' => now(), 'actual' => 0],
+            ['id' => 1, 'name' => 'Name 1', 'price' => 1.58, 'created_at' => now(), 'actual' => 1, 'actual2' => 1, 'relation' => ['actual' => 1, 'actual2' => 1]],
+            ['id' => 2, 'name' => 'Name 2', 'price' => 1.68, 'created_at' => now(), 'actual' => 1, 'actual2' => 1, 'relation' => ['actual' => 1, 'actual2' => 1]],
+            ['id' => 3, 'name' => 'Name 3', 'price' => 1.78, 'created_at' => now(), 'actual' => 1, 'actual2' => 1, 'relation' => ['actual' => 1, 'actual2' => 1]],
+            ['id' => 4, 'name' => 'Name 4', 'price' => 1.88, 'created_at' => now(), 'actual' => 0, 'actual2' => 0, 'relation' => ['actual' => 0, 'actual2' => 0]],
+            ['id' => 5, 'name' => 'Name 5', 'price' => 1.98, 'created_at' => now(), 'actual' => 0, 'actual2' => 0, 'relation' => ['actual' => 0, 'actual2' => 0]],
         ]);
     }
 
@@ -48,6 +48,9 @@ final class UserTable extends PowerGridComponent
             ->addColumn('name')
             ->addColumn('price')
             ->addColumn('actual')
+            ->addColumn('actual2')
+            ->addColumn('relation.actual')
+            ->addColumn('relation.actual2')
             ->addColumn('created_at_formatted', function ($entry) {
                 return Carbon::parse($entry->created_at)->format('d/m/Y');
             });
@@ -69,6 +72,9 @@ final class UserTable extends PowerGridComponent
                 ->sortable(),
 
             Column::make('Actual', 'actual'),
+            Column::make('Actual2', 'actual2'),
+            Column::make('Relation Actual', 'relation.actual'),
+            Column::make('Relation Actual2', 'relation.actual2'),
 
             Column::make('Created', 'created_at_formatted'),
 
@@ -84,6 +90,15 @@ final class UserTable extends PowerGridComponent
             Filter::enumSelect('actual', 'actual')
                 ->dataSource(\App\Support\Enums\YesNo::cases())
                 ->optionLabel('actual'),
+            Filter::enumSelect('actual2', 'actual2')
+                ->dataSource(\App\Support\Enums\YesNo::cases())
+                ->optionLabel('actual2'),
+            Filter::enumSelect('relation.actual', 'relation.actual')
+                ->dataSource(\App\Support\Enums\YesNo::cases())
+                ->optionLabel('relation.actual'),
+            Filter::enumSelect('relation.actual2', 'relation.actual2')
+                ->dataSource(\App\Support\Enums\YesNo::cases())
+                ->optionLabel('relation.actual2'),
         ];
     }
 }
