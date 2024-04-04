@@ -1,9 +1,10 @@
 <div
-    x-data="{ open: false }"
-    @click.outside="open = false"
+    x-data="{ open: false, countChecked: @entangle('checkboxValues').live }"
+    x-on:keydown.esc="open = false"
+    x-on:click.outside="open = false;"
 >
     <button
-        @click.prevent="open = ! open"
+        @click.prevent="open = true"
         class="pg-btn-white dark:ring-pg-primary-600 dark:border-pg-primary-600 dark:hover:bg-pg-primary-700
     dark:ring-offset-pg-primary-800 dark:text-pg-primary-400 dark:bg-pg-primary-700"
     >
@@ -13,69 +14,73 @@
     </button>
 
     <div
-        x-show="open"
         x-cloak
-        x-transition:enter="transform duration-200"
-        x-transition:enter-start="opacity-0 scale-90"
-        x-transition:enter-end="opacity-100 scale-100"
-        x-transition:leave="transform duration-200"
-        x-transition:leave-start="opacity-100 scale-100"
-        x-transition:leave-end="opacity-0 scale-90"
-        class="mt-2 w-auto bg-white shadow-xl absolute z-10 dark:bg-pg-primary-700"
+        x-show="open"
+        x-transition:enter="transition ease-out duration-100"
+        x-transition:enter-start="transform opacity-0 scale-95"
+        x-transition:enter-end="transform opacity-100 scale-100"
+        x-transition:leave="transition ease-in duration-75"
+        x-transition:leave-start="transform opacity-100 scale-100"
+        x-transition:leave-end="transform opacity-0 scale-95"
+        class="absolute z-10 mt-2 rounded-md dark:bg-pg-primary-700 bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+        tabindex="-1"
+        @keydown.tab="open = false"
+        @keydown.enter.prevent="open = false;"
+        @keyup.space.prevent="open = false;"
     >
-
         @if (in_array('xlsx', data_get($setUp, 'exportable.type')))
-            <div class="flex px-4 py-2 text-pg-primary-400 dark:text-pg-primary-300">
+            <div class="flex items-center px-4 py-1 text-pg-primary-400 dark:text-pg-primary-300 border-b border-pg-primary-100 dark:border-pg-primary-600">
                 <span class="w-12">@lang('XLSX')</span>
-                <a
+                <button
                     wire:click.prevent="exportToXLS"
                     x-on:click="open = false"
                     href="#"
-                    class="px-2 block text-pg-primary-800 hover:bg-pg-primary-50 hover:text-black-300 dark:text-pg-primary-200 dark:hover:bg-pg-primary-700 rounded"
+                    class="px-2 py-1 block text-pg-primary-800 hover:bg-pg-primary-100 hover:text-black-300 dark:text-pg-primary-200 dark:hover:bg-pg-primary-800 rounded"
                 >
+                    <span class="export-count text-xs">({{ $total }})</span>
                     @if (count($enabledFilters) === 0)
                         @lang('livewire-powergrid::datatable.labels.all')
                     @else
                         @lang('livewire-powergrid::datatable.labels.filtered')
                     @endif
 
-                </a>
+                </button>
                 @if ($checkbox)
-                    <a
-                        wire:click.prevent="exportToXLS(true)"
-                        x-on:click="open = false"
-                        href="#"
-                        class="px-2 block text-pg-primary-800 hover:bg-pg-primary-50 hover:text-black-300 dark:text-pg-primary-200 dark:hover:bg-pg-primary-700 rounded"
+                    <button wire:click.prevent="exportToXLS(true)"
+                       x-on:click="open = false"
+                       x-bind:disabled="countChecked.length === 0"
+                       :class="{'cursor-not-allowed' : countChecked.length === 0}"
+                       class="px-2 py-1 block text-pg-primary-800 hover:bg-pg-primary-100 hover:text-black-300 dark:text-pg-primary-200 dark:hover:bg-pg-primary-800 rounded"
                     >
-                        @lang('livewire-powergrid::datatable.labels.selected')
-                    </a>
+                        <span class="export-count text-xs" x-text="`(${countChecked.length})`"></span> @lang('livewire-powergrid::datatable.labels.selected')
+                    </button>
                 @endif
             </div>
         @endif
         @if (in_array('csv', data_get($setUp, 'exportable.type')))
-            <div class="flex px-4 py-2 text-pg-primary-400 dark:text-pg-primary-300">
+            <div class="flex items-center px-4 py-1 text-pg-primary-400 dark:text-pg-primary-300">
                 <span class="w-12">@lang('Csv')</span>
-                <a
+                <button
                     wire:click.prevent="exportToCsv"
                     x-on:click="open = false"
-                    href="#"
-                    class="px-2 block text-pg-primary-800 hover:bg-pg-primary-50 hover:text-black-300 dark:text-pg-primary-200 dark:hover:bg-pg-primary-700 rounded"
+                    class="px-2 py-1 block text-pg-primary-800 hover:bg-pg-primary-100 hover:text-black-300 dark:text-pg-primary-200 dark:hover:bg-pg-primary-800 rounded"
                 >
+                    <span class="export-count text-xs">({{ $total }})</span>
                     @if (count($enabledFilters) === 0)
                         @lang('livewire-powergrid::datatable.labels.all')
                     @else
                         @lang('livewire-powergrid::datatable.labels.filtered')
                     @endif
-                </a>
+                </button>
                 @if ($checkbox)
-                    <a
+                    <button
                         wire:click.prevent="exportToCsv(true)"
                         x-on:click="open = false"
-                        href="#"
-                        class="px-2 block text-pg-primary-800 hover:bg-pg-primary-50 hover:text-black-300 dark:text-pg-primary-200 dark:hover:bg-pg-primary-700 rounded"
+                        :class="{'cursor-not-allowed' : countChecked.length === 0}"
+                        class="px-2 py-1 block text-pg-primary-800 hover:bg-pg-primary-100 hover:text-black-300 dark:text-pg-primary-200 dark:hover:bg-pg-primary-800 rounded"
                     >
-                        @lang('livewire-powergrid::datatable.labels.selected')
-                    </a>
+                        <span class="export-count text-xs" x-text="`(${countChecked.length})`"></span> @lang('livewire-powergrid::datatable.labels.selected')
+                    </button>
                 @endif
             </div>
         @endif

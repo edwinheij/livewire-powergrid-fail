@@ -12,7 +12,7 @@ return [
     */
 
     'theme' => \PowerComponents\LivewirePowerGrid\Themes\Tailwind::class,
-//    'theme' => \PowerComponents\LivewirePowerGrid\Themes\Bootstrap5::class,
+    //'theme' => \PowerComponents\LivewirePowerGrid\Themes\Bootstrap5::class,
 
     /*
     |--------------------------------------------------------------------------
@@ -89,7 +89,7 @@ return [
     |
     */
 
-    'cached_data' => false,
+    'cached_data' => true,
 
     /*
     |--------------------------------------------------------------------------

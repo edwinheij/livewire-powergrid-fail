@@ -28,7 +28,7 @@
 
 @foreach ($columns as $column)
     @php
-        $content = $row->{$column->field} ?? null;
+        $content = $row->{$column->field} ?? '';
         $contentClassField = $column->contentClassField != '' ? $row->{$column->contentClassField} : '';
         $content = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $content);
         $field = $column->dataField != '' ? $column->dataField : $column->field;
@@ -45,12 +45,20 @@
         wire:key="row-{{ $column->field }}-{{ $childIndex }}"
     >
         <div class="pg-actions">
+            @if(empty(data_get($row, 'actions')) && $column->isAction)
+                @if (method_exists($this, 'actionsFromView') && $actionsFromView = $this->actionsFromView($row))
+                    <div wire:key="actions-view-{{ data_get($row, $primaryKey) }}">
+                        {!! $actionsFromView !!}
+                    </div>
+                @endif
+            @endif
+
             @if (filled(data_get($row, 'actions')) && $column->isAction)
                 @foreach (data_get($row, 'actions') as $key => $action)
                     @if(filled($action))
-                        <div wire:key="action-{{ data_get($row, $primaryKey) }}-{{ $key }}">
+                        <span wire:key="action-{{ data_get($row, $primaryKey) }}-{{ $key }}">
                             {!! $action !!}
-                        </div>
+                        </span>
                     @endif
                 @endforeach
             @endif

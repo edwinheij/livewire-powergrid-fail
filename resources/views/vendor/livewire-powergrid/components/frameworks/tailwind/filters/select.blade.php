@@ -6,12 +6,12 @@
     'filter' => null,
 ])
 @php
-    unset($filter['className']);
-    extract($filter);
+    $field = data_get($filter, 'field');
+    $title = data_get($column, 'title');
 
     $defaultAttributes = \PowerComponents\LivewirePowerGrid\Components\Filters\FilterSelect::getWireAttributes($field, $title);
 
-    $filterClasses = Arr::toCssClasses([data_get($theme, 'selectClass'), $class, data_get($column, 'headerClass'), 'power_grid']);
+    $filterClasses = \Illuminate\Support\Arr::toCssClasses([data_get($theme, 'selectClass'), $class, data_get($column, 'headerClass'), 'power_grid']);
 
     $params = array_merge([...data_get($filter, 'attributes'), ...$defaultAttributes], $filter);
 @endphp
@@ -40,7 +40,15 @@
                 {{ $defaultAttributes['selectAttributes'] }}
             >
                 <option value="">{{ trans('livewire-powergrid::datatable.select.all') }}</option>
-                @foreach (data_get($filter, 'dataSource') as $key => $item)
+
+                @php
+                    $computedDatasource = data_get($filter, 'computedDatasource');
+                    $dataSource = filled($computedDatasource)
+                        ? $this->{$computedDatasource}
+                        : data_get($filter, 'dataSource');
+                @endphp
+
+                @foreach ($dataSource as $key => $item)
                     <option
                         wire:key="select-{{ $tableName }}-{{ $key }}"
                         value="{{ $item[data_get($filter, 'optionValue')] }}"

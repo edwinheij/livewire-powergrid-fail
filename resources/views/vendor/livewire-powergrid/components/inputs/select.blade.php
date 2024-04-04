@@ -5,6 +5,7 @@
     'tableName' => null,
     'multiple' => true,
     'initialValues' => [],
+    'title' => ''
 ])
 
 @php
@@ -12,17 +13,26 @@
     $collection = collect();
 
     if (filled(data_get($filter, 'dataSource'))) {
-        $collection = collect(data_get($filter, 'dataSource'))->transform(function (array|\Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model $entry) use ($filter) {
-            if (is_array($entry)) {
-                $entry = collect($entry);
-            }
+        $collection = collect(data_get($filter, 'dataSource'))
+            ->transform(function (array|\Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model $entry) use ($filter) {
+                if (is_array($entry)) {
+                    $entry = collect($entry);
+                }
+            return $entry->only([data_get($filter, 'optionValue'), data_get($filter, 'optionLabel')]);
+        });
+    } elseif (filled(data_get($filter, 'computedDatasource'))) {
+        $collection = collect(data_get($filter, 'computedDatasource'))
+            ->transform(function (array|\Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model $entry) use ($filter) {
+                if (is_array($entry)) {
+                    $entry = collect($entry);
+                }
             return $entry->only([data_get($filter, 'optionValue'), data_get($filter, 'optionLabel')]);
         });
     }
 
     $params = [
         'tableName' => $tableName,
-        'label' => data_get($filter, 'title'),
+        'label' => $title,
         'dataField' => data_get($filter, 'field'),
         'optionValue' => data_get($filter, 'optionValue'),
         'optionLabel' => data_get($filter, 'optionLabel'),
@@ -53,7 +63,7 @@
         >
             @if (!$inline)
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                    {{ data_get($filter, 'title') }}
+                    {{ $title }}
                 </label>
             @endif
             <select
@@ -65,7 +75,8 @@
                 <option value="">{{ trans('livewire-powergrid::datatable.multi_select.all') }}</option>
                 @if (blank(data_get($params, 'asyncData', [])))
                     @foreach ($collection->toArray() as $item)
-                        <option value="{{ data_get($item, data_get($filter, 'optionValue')) }}">
+                        <option wire:key="multi-select-option-{{ $loop->index }}"
+                                value="{{ data_get($item, data_get($filter, 'optionValue')) }}">
                             {{ data_get($item, data_get($filter, 'optionLabel')) }}
                         </option>
                     @endforeach
